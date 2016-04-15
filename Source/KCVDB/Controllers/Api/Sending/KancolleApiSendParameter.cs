@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KCVDB.Controllers.Sending
+namespace KCVDB.Controllers.Api.Sending
 {
 	public class KancolleApiSendParameter
 	{
