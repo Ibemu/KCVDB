@@ -7,6 +7,8 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
 using System.Web.Http;
+using Unity.WebApi;
+using Microsoft.Practices.Unity;
 
 namespace KCVDB
 {
@@ -16,8 +18,9 @@ namespace KCVDB
         {
             // アプリケーションのスタートアップで実行するコードです
             AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);            
+			UnityConfig.RegisterComponents();
+			GlobalConfiguration.Configure(WebApiConfig.Register);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
     }
 }
