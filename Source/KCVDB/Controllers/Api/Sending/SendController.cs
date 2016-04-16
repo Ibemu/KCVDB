@@ -1,4 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using KCVDB.Services;
@@ -6,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace KCVDB.Controllers.Api.Sending
 {
-	[RoutePrefix("send")]
+	[RoutePrefix("api/send")]
 	public class SendController : ApiControllerBase
 	{
 		IApiDataWriter ApiDataWriter { get; }
@@ -47,6 +52,51 @@ namespace KCVDB.Controllers.Api.Sending
 				apiDataArray);
 
 			return NoContent();
+		}
+
+		[Route("gzip")]
+		[HttpPost]
+		public async Task<IHttpActionResult> PostGzipAsync()
+		{
+			if (!Request.Content.IsMimeMultipartContent()) {
+				return UnsupportedMediaType();
+			}
+
+			var provider = await Request.Content.ReadAsMultipartAsync();
+			var metadataPart = provider.Contents.FirstOrDefault(x => x.Headers.ContentDisposition.Name == "metadata");
+			var bodyPart = provider.Contents.FirstOrDefault(x => x.Headers.ContentDisposition.Name == "body");
+
+			if (metadataPart == null || bodyPart == null) {
+				return BadRequest();
+			}
+
+			var metadataJson = await metadataPart.ReadAsStringAsync();
+			var bodyJson = await DecompressToStringAsync(await bodyPart.ReadAsByteArrayAsync());
+
+			var metadata = JsonConvert.DeserializeObject<PostGzipMetadata>(metadataJson);
+			var apiDataArray = JsonConvert.DeserializeObject<ApiData[]>(bodyJson);
+			await ApiDataWriter.WriteAsync(
+				metadata.AgentId,
+				metadata.SessionId,
+				apiDataArray);
+
+			return NoContent();
+		}
+
+		async Task<string> DecompressToStringAsync(byte[] compressedBuffer) {
+			using (var compressedMemoryStream = new MemoryStream(compressedBuffer))
+			using (var gzipStream = new GZipStream(compressedMemoryStream, CompressionMode.Decompress))
+			using (var decompressedMemoryStream = new MemoryStream()) {
+				await gzipStream.CopyToAsync(decompressedMemoryStream);
+				return Encoding.UTF8.GetString(decompressedMemoryStream.ToArray());
+			}
+		}
+
+		class PostGzipMetadata
+		{
+			public string SessionId { get; set; }
+			
+			public string AgentId { get; set; }
 		}
 	}
 }

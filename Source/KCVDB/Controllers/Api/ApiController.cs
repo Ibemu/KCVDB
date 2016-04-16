@@ -23,5 +23,10 @@ namespace KCVDB.Controllers.Api
 		{
 			return new HttpResponseResult(Request.CreateResponse(HttpStatusCode.NoContent));
 		}
+
+		protected HttpResponseResult UnsupportedMediaType()
+		{
+			return new HttpResponseResult(Request.CreateResponse(HttpStatusCode.UnsupportedMediaType));
+		}
 	}
 }

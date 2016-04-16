@@ -22,7 +22,11 @@ namespace KCVDB
 			// サービスを登録
 
 			// この処理環境ごとに振り分けできるようなクラス作ってそこに任せたい
+#if DEBUG
+			var storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
+#else
 			var storageAccount = CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings[Constants.BlobStorage.ApiDataStorageKey].ConnectionString);
+#endif
 			var blobClient = storageAccount.CreateCloudBlobClient();
 			var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
 
