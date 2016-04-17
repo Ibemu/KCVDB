@@ -17,6 +17,17 @@
 			/// </remarks>
 			public static string BlobFileNameFormat { get; } = @"{0}\{1}.log";
 			public static string ApiRawFileNewLine { get; } = "\r\n";
+
+            /// <summary>
+            /// api_portの部分一致検索用
+            /// </summary>
+            public static string ApiPortEqual { get; } = "/kcsapi/api_port/port";
+
+            /// <summary>
+            /// 24時を基準にBlobを分ける時間を設定
+            /// 例）5時なら-5と設定。23時なら1と設定。
+            /// </summary>
+            public static int OffsetTime { get; } = 0;
 		}
 	}
 }
