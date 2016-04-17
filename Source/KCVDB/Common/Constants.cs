@@ -24,6 +24,11 @@
             public static string ApiPortEqual { get; } = "/kcsapi/api_port/port";
 
             /// <summary>
+            /// api_start2の部分一致検索用
+            /// </summary>
+            public static string ApiStart2Equal { get; } = "/kcsapi/api_start2";
+
+            /// <summary>
             /// 24時を基準にBlobを分ける時間を設定
             /// 例）5時なら-5と設定。23時なら1と設定。
             /// </summary>

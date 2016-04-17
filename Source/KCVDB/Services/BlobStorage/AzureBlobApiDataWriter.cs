@@ -66,7 +66,7 @@ namespace KCVDB.Services.BlobStorage
                 // 昨日の日付のBlobが存在する
                 if(await appendBlobYesterday.ExistsAsync()){
                     // api_portが含まれる要素のindexを取得
-                    var index = FindApiElement(apiData);
+                    var index = FindApiElement(apiData, Constants.BlobStorage.ApiPortEqual);
                     if(index > -1){
                         var dataOfYesterday = apiData.Take(index).Select(x => SerializeApiData(agentId, sessionId, x) + Constants.BlobStorage.ApiRawFileNewLine);
                         var dataOfToday = apiData.Skip(index -1).Select(x => SerializeApiData(agentId, sessionId, x) + Constants.BlobStorage.ApiRawFileNewLine);
@@ -82,8 +82,16 @@ namespace KCVDB.Services.BlobStorage
                         return;
                     }
                     else{
-                        // 見つからないなら前日のファイルに書き込み
-                        appendBlob = appendBlobYesterday;
+                        index = FindApiElement(apiData, Constants.BlobStorage.ApiStart2Equal);
+                        if (index > 0){
+                            // start2が含まれていたら当日扱いにする
+                            appendBlob = appendBlobToday;
+                        }
+                        else {
+                            // それ以外の場合はportがくるまで、
+                            // 前日データに関連している可能性があるので前日扱いとする
+                            appendBlob = appendBlobYesterday;
+                        }
                     }
 
                 }
@@ -127,10 +135,10 @@ namespace KCVDB.Services.BlobStorage
         /// </summary>
         /// <param name="apiDatas">受信したデータ</param>
         /// <returns>一致した要素が見つかったindex</returns>
-        int FindApiElement(IEnumerable<ApiData> apiDatas)
+        int FindApiElement(IEnumerable<ApiData> apiDatas, string apiUrl)
         {
             return (apiDatas.Select((x, i) => new { Data = x, Index = i })
-                            .FirstOrDefault(x => x.Data.RequestUri.Contains(Constants.BlobStorage.ApiPortEqual))
+                            .FirstOrDefault(x => x.Data.RequestUri.Contains(apiUrl))
                             ?.Index ?? 0) - 1;
         }
 	}
