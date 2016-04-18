@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using KCVDB.Utils;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace KCVDB.Services.BlobStorage
 {
@@ -11,10 +12,14 @@ namespace KCVDB.Services.BlobStorage
 	{
 		public CloudBlobContainer BlobContainer { get; }
 
-		public AzureBlobApiDataWriter(CloudBlobContainer blobContainer)
+        public CloudTable TableContainer { get; }
+
+		public AzureBlobApiDataWriter(CloudBlobContainer blobContainer, CloudTable tableContainer)
 		{
 			if (blobContainer == null) { throw new ArgumentNullException(nameof(blobContainer)); }
-			BlobContainer = blobContainer;
+            if (tableContainer == null) { throw new ArgumentNullException(nameof(tableContainer)); }
+            BlobContainer = blobContainer;
+            TableContainer = tableContainer;
 		}
 
 		public Task WriteAsync(string agentId, string sessionId, ApiData apiData)
@@ -31,9 +36,22 @@ namespace KCVDB.Services.BlobStorage
 			// コンテナなかったら作る
 			await BlobContainer.CreateIfNotExistsAsync();
 
-            // 現在日付と前日の日付
+            // テーブルがなかったら作る
+            await TableContainer.CreateIfNotExistsAsync();
+
+            // 現在日付
             DateTime Today = DateTime.Now.AddHours(Constants.BlobStorage.OffsetTime);
-            DateTime Yesterday = Today.AddDays(-1);
+            // 前回アクセスした日付
+            DateTime BeforeAccessday = Today.AddDays(-1);
+            // TableStorageから取得
+            TableOperation RetrieveOperation = TableOperation.Retrieve<SessinEntity>(sessionId,sessionId);
+            TableResult RetrievedResult = TableContainer.Execute(RetrieveOperation);
+            if(RetrievedResult.Result != null){
+                BeforeAccessday = ((SessinEntity)RetrievedResult.Result).BeforeAccessTime;
+            }
+            else{
+                // 該当するものがなかったら、昨日の日付にしておく
+            }
 
 			// Append Blob への参照を作成（現在日付）
 			var blobNameToday = string.Format(
@@ -42,20 +60,19 @@ namespace KCVDB.Services.BlobStorage
 				sessionId.ToLower());
 			var appendBlobToday = BlobContainer.GetAppendBlobReference(blobNameToday);
 
-            // Append Blob への参照を作成（前日）
-            var blobNameYesterday = string.Format(
+            // Append Blob への参照を作成（前回アクセスした日付）
+            var blobNameBeforeAccessday = string.Format(
                 Constants.BlobStorage.BlobFileNameFormat,
-                Yesterday.ToString(Constants.BlobStorage.BlobFileNameDateTimeToStringFormat),
+                BeforeAccessday.ToString(Constants.BlobStorage.BlobFileNameDateTimeToStringFormat),
                 sessionId.ToLower());
-            var appendBlobYesterday = BlobContainer.GetAppendBlobReference(blobNameYesterday);
-
-
-
+            var appendBlobBeforeAccessday = BlobContainer.GetAppendBlobReference(blobNameBeforeAccessday);
+            
             // データを文字列に変換
             var serializedTexts = apiData.Select(x => SerializeApiData(agentId, sessionId, x) + Constants.BlobStorage.ApiRawFileNewLine);
             var textToWrite = string.Concat(serializedTexts);
 
             CloudAppendBlob appendBlob = null;
+            bool isCreate = false;
 
             // 今日の日付のBlobが既に作成されている場合
             if (await appendBlobToday.ExistsAsync()){
@@ -64,22 +81,22 @@ namespace KCVDB.Services.BlobStorage
             // 今日の日付のBlobがない
             else{
                 // 昨日の日付のBlobが存在する
-                if(await appendBlobYesterday.ExistsAsync()){
+                if(await appendBlobBeforeAccessday.ExistsAsync()){
                     // api_portが含まれる要素のindexを取得
                     var index = FindApiElement(apiData, Constants.BlobStorage.ApiPortEqual);
                     if(index > -1){
-                        var dataOfYesterday = apiData.Take(index).Select(x => SerializeApiData(agentId, sessionId, x) + Constants.BlobStorage.ApiRawFileNewLine);
+                        var dataOfBeforeAccessday = apiData.Take(index).Select(x => SerializeApiData(agentId, sessionId, x) + Constants.BlobStorage.ApiRawFileNewLine);
                         var dataOfToday = apiData.Skip(index -1).Select(x => SerializeApiData(agentId, sessionId, x) + Constants.BlobStorage.ApiRawFileNewLine);
 
                         // 今日のBlobは絶対存在しないのでここで作成
                         await appendBlobToday.CreateOrReplaceAsync();
 
                         // ....〆(･ω･｀ )ｶｷｶｷ
-                        await appendBlobYesterday.AppendTextAsync(string.Concat(dataOfYesterday));
+                        await appendBlobBeforeAccessday.AppendTextAsync(string.Concat(dataOfBeforeAccessday));
                         await appendBlobToday.AppendTextAsync(string.Concat(dataOfToday));
 
                         // 両方書いたので終わり
-                        return;
+                        isCreate = true;
                     }
                     else{
                         index = FindApiElement(apiData, Constants.BlobStorage.ApiStart2Equal);
@@ -90,7 +107,7 @@ namespace KCVDB.Services.BlobStorage
                         else {
                             // それ以外の場合はportがくるまで、
                             // 前日データに関連している可能性があるので前日扱いとする
-                            appendBlob = appendBlobYesterday;
+                            appendBlob = appendBlobBeforeAccessday;
                         }
                     }
 
@@ -100,7 +117,20 @@ namespace KCVDB.Services.BlobStorage
                     appendBlob = appendBlobToday;
                 }
             }
-            
+
+            var updateEntry = (SessinEntity)RetrievedResult.Result;
+
+            if(updateEntry != null){
+                updateEntry.BeforeAccessTime = Today;
+                TableOperation insertupdateOpe = TableOperation.InsertOrReplace(updateEntry);
+
+                TableContainer.Execute(insertupdateOpe);
+            }
+
+            // もう作ってたら終わりー
+            if(isCreate){
+                return;
+            }
 
             // Blobが生成されていなければ作成
             if (!(await appendBlob.ExistsAsync())) {

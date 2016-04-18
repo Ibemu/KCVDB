@@ -6,6 +6,7 @@
 		{
 			public static string ApiDataStorageKey { get; } = "KCVDBStorageConnectionString";
 			public static string ApiDataBlobContainerName { get; } = "kancolleapidataraw"; // 必ず小文字な！
+            public static string ApiDataTableContainerName { get; } = "sessionmanage";
 			public static string BlobFileNameDateTimeToStringFormat { get; } = @"yyyy\\MM\\dd";
 
 			/// <summary>

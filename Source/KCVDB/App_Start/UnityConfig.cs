@@ -30,9 +30,12 @@ namespace KCVDB
 			var blobClient = storageAccount.CreateCloudBlobClient();
 			var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
 
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableContainer = tableClient.GetTableReference(Constants.BlobStorage.ApiDataTableContainerName);
+
 			container.RegisterType<IApiDataWriter>(
 				new ContainerControlledLifetimeManager(),
-				new InjectionFactory(c => new AzureBlobApiDataWriter(blobContainer)));
+				new InjectionFactory(c => new AzureBlobApiDataWriter(blobContainer, tableContainer)));
             
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }

@@ -167,6 +167,7 @@
     <Compile Include="Services\ApiData.cs" />
     <Compile Include="Services\IApiDataWriter.cs" />
     <Compile Include="Services\BlobStorage\AzureBlobApiDataWriter.cs" />
+    <Compile Include="Services\SessinEntity.cs" />
     <Compile Include="Utils\StringExetnsions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -198,7 +199,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>45388</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
