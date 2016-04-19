@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace KCVDB.Services
+namespace KCVDB.Services.BlobStorage
 {
     public class SessinEntity : TableEntity
     {
