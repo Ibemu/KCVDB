@@ -76,10 +76,10 @@ namespace KCVDB.Services.BlobStorage
                 // api_portが含まれる要素のindexを取得
                 var firstPortIndex = FindFirstApiIndexOf(apiData, Constants.BlobStorage.ApiPortPath);
 
-                var beforePort = apiData.Take(firstPortIndex + 1);
-                var afterPort = apiData.Skip(firstPortIndex);
+                var beforePort = firstPortIndex < 0 ? apiData : apiData.Take(firstPortIndex + 1);
+                var afterPort = firstPortIndex < 0 ? Enumerable.Empty<ApiData>() : apiData.Skip(firstPortIndex);
 
-                if(beforePort.Any())
+                if (beforePort.Any())
                 {
                     var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
                     await WriteBlob(appendBlob, beforePort, agentId, sessionId);
