@@ -6,16 +6,18 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace KCVDB.Services.BlobStorage
 {
-    public class SessinEntity : TableEntity
+    public class SessionEntity : TableEntity
     {
-        public SessinEntity(string sessionId)
+        public SessionEntity(string sessionId)
         {
             this.PartitionKey = sessionId;
             this.RowKey = sessionId;
         }
 
-        public SessinEntity() { }
+        public SessionEntity() { }
 
-        public DateTime BeforeAccessTime { get; set; }
+        public DateTime BlobCreated { get; set; }
+
+        public string BlobName { get; set; }
     }
 }

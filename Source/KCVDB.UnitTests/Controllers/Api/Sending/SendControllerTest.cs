@@ -63,7 +63,211 @@ namespace KCVDB.UnitTests.Controllers.Api.Sending
 			Assert.AreEqual(HttpStatusCode.NoContent, ret.StatusCode);
 		}
 
-		class ApiDataEqualityComparer : IEqualityComparer<ApiData>
+        [TestMethod]
+        public async Task apiPortで切り替えチェック日付変わる前その1()
+        {
+            var agentId = "ほっぽっぽっぽっっぽ";
+            var sessionId = "sessionId固定その1";
+            var apiDataArray = new ApiData[] {
+                new ApiData {
+                    HttpDate = "2016/4/17 HttpDate",
+                    LocalTime = "2016/4/17 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "なし",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_get_member/useitem",
+                    StatusCode = 0000,
+                },
+                new ApiData {
+                    HttpDate = "2016/4/17 HttpDate",
+                    LocalTime = "2016/4/17 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "なし",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_get_member/kdock",
+                    StatusCode = 0000,
+                },
+            };
+
+            var apiDataWriterMock = new Mock<IApiDataWriter>();
+            apiDataWriterMock
+                .Setup(x => x.WriteAsync(
+                    It.Is<string>(value => value == agentId),
+                    It.Is<string>(value => value == sessionId),
+                    It.Is<ApiData[]>(value => Enumerable.SequenceEqual(value, apiDataArray, new ApiDataEqualityComparer())))
+                )
+                .Returns(Task.Delay(0));
+
+            var parameter = new MultiPostParameter
+            {
+                AgentId = agentId,
+                SessionId = sessionId,
+                JsonArrayData = JsonConvert.SerializeObject(apiDataArray)
+            };
+
+            var controller = new SendController(apiDataWriterMock.Object)
+            {
+                Request = new System.Net.Http.HttpRequestMessage()
+            };
+            var result = await controller.MultiPostAsync(parameter);
+            var ret = await result.ExecuteAsync(CancellationToken.None);
+            Assert.AreEqual(HttpStatusCode.NoContent, ret.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task apiPortで切り替えチェック日付変わる前その2()
+        {
+            var agentId = "ほっぽっぽっぽっっぽ";
+            var sessionId = "sessionId固定その2";
+            var apiDataArray = new ApiData[] {
+                new ApiData {
+                    HttpDate = "2016/4/17 HttpDate",
+                    LocalTime = "2016/4/17 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "なし",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_get_member/useitem",
+                    StatusCode = 0000,
+                },
+                new ApiData {
+                    HttpDate = "2016/4/17 HttpDate",
+                    LocalTime = "2016/4/17 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "なし",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_get_member/kdock",
+                    StatusCode = 0000,
+                },
+            };
+
+            var apiDataWriterMock = new Mock<IApiDataWriter>();
+            apiDataWriterMock
+                .Setup(x => x.WriteAsync(
+                    It.Is<string>(value => value == agentId),
+                    It.Is<string>(value => value == sessionId),
+                    It.Is<ApiData[]>(value => Enumerable.SequenceEqual(value, apiDataArray, new ApiDataEqualityComparer())))
+                )
+                .Returns(Task.Delay(0));
+
+            var parameter = new MultiPostParameter
+            {
+                AgentId = agentId,
+                SessionId = sessionId,
+                JsonArrayData = JsonConvert.SerializeObject(apiDataArray)
+            };
+
+            var controller = new SendController(apiDataWriterMock.Object)
+            {
+                Request = new System.Net.Http.HttpRequestMessage()
+            };
+            var result = await controller.MultiPostAsync(parameter);
+            var ret = await result.ExecuteAsync(CancellationToken.None);
+            Assert.AreEqual(HttpStatusCode.NoContent, ret.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task apiPortで切り替えチェック日付変わった後その1()
+        {
+            var agentId = "ほっぽっぽっぽっっぽ";
+            var sessionId = "sessionId固定その1";
+            var apiDataArray = new ApiData[] {
+                new ApiData {
+                    HttpDate = "2016/4/17 HttpDate",
+                    LocalTime = "2016/4/17 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "なし",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_get_member/unsetslot",
+                    StatusCode = 0000,
+                },
+                new ApiData {
+                    HttpDate = "2016/4/18 HttpDate",
+                    LocalTime = "2016/4/18 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "切り替わるぞ",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                    StatusCode = 0000,
+                },
+                new ApiData {
+                    HttpDate = "2016/4/18 HttpDate",
+                    LocalTime = "2016/4/18 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "変わったにょ",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_req_mission/result",
+                    StatusCode = 0000,
+                },
+                new ApiData {
+                    HttpDate = "2016/4/18 HttpDate",
+                    LocalTime = "2016/4/18 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "変わったにょ",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                    StatusCode = 0000,
+                },
+            };
+
+            var apiDataWriterMock = new Mock<IApiDataWriter>();
+            apiDataWriterMock
+                .Setup(x => x.WriteAsync(
+                    It.Is<string>(value => value == agentId),
+                    It.Is<string>(value => value == sessionId),
+                    It.Is<ApiData[]>(value => Enumerable.SequenceEqual(value, apiDataArray, new ApiDataEqualityComparer())))
+                )
+                .Returns(Task.Delay(0));
+
+            var parameter = new MultiPostParameter
+            {
+                AgentId = agentId,
+                SessionId = sessionId,
+                JsonArrayData = JsonConvert.SerializeObject(apiDataArray)
+            };
+
+            var controller = new SendController(apiDataWriterMock.Object)
+            {
+                Request = new System.Net.Http.HttpRequestMessage()
+            };
+            var result = await controller.MultiPostAsync(parameter);
+            var ret = await result.ExecuteAsync(CancellationToken.None);
+            Assert.AreEqual(HttpStatusCode.NoContent, ret.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task apiPortで切り替えチェック日付変わった後その2()
+        {
+            var agentId = "ほっぽっぽっぽっっぽ";
+            var sessionId = "sessionId固定その1";
+            var apiDataArray = new ApiData[] {
+                new ApiData {
+                    HttpDate = "2016/4/18 HttpDate",
+                    LocalTime = "2016/4/18 LocalTime",
+                    RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                    ResponseBody = "切り替わるぞ",
+                    RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                    StatusCode = 0000,
+                },
+            };
+
+            var apiDataWriterMock = new Mock<IApiDataWriter>();
+            apiDataWriterMock
+                .Setup(x => x.WriteAsync(
+                    It.Is<string>(value => value == agentId),
+                    It.Is<string>(value => value == sessionId),
+                    It.Is<ApiData[]>(value => Enumerable.SequenceEqual(value, apiDataArray, new ApiDataEqualityComparer())))
+                )
+                .Returns(Task.Delay(0));
+
+            var parameter = new MultiPostParameter
+            {
+                AgentId = agentId,
+                SessionId = sessionId,
+                JsonArrayData = JsonConvert.SerializeObject(apiDataArray)
+            };
+
+            var controller = new SendController(apiDataWriterMock.Object)
+            {
+                Request = new System.Net.Http.HttpRequestMessage()
+            };
+            var result = await controller.MultiPostAsync(parameter);
+            var ret = await result.ExecuteAsync(CancellationToken.None);
+            Assert.AreEqual(HttpStatusCode.NoContent, ret.StatusCode);
+        }
+
+        class ApiDataEqualityComparer : IEqualityComparer<ApiData>
 		{
 			public bool Equals(ApiData x, ApiData y)
 			{

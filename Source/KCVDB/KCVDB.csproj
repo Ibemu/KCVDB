@@ -167,7 +167,7 @@
     <Compile Include="Services\ApiData.cs" />
     <Compile Include="Services\IApiDataWriter.cs" />
     <Compile Include="Services\BlobStorage\AzureBlobApiDataWriter.cs" />
-    <Compile Include="Services\BlobStorage\SessinEntity.cs" />
+    <Compile Include="Services\BlobStorage\SessionEntity.cs" />
     <Compile Include="Utils\StringExetnsions.cs" />
   </ItemGroup>
   <ItemGroup>
