@@ -64,7 +64,7 @@ namespace KCVDB.UnitTests.Controllers.Api.Sending
 		}
 
         [TestMethod]
-        public async Task apiPortで切り替えチェック日付変わる前その1()
+        public void apiPortで切り替えチェック日付変わる前その1()
         {
             var agentId = "ほっぽっぽっぽっっぽ";
             var sessionId = "sessionId固定その1";
@@ -93,23 +93,26 @@ namespace KCVDB.UnitTests.Controllers.Api.Sending
                     It.Is<string>(value => value == agentId),
                     It.Is<string>(value => value == sessionId),
                     It.Is<ApiData[]>(value => Enumerable.SequenceEqual(value, apiDataArray, new ApiDataEqualityComparer())))
-                )
-                .Returns(Task.Delay(0));
+                );
 
-            var parameter = new MultiPostParameter
+            var parameter = new KancolleApiSendParameter
             {
                 AgentId = agentId,
-                SessionId = sessionId,
-                JsonArrayData = JsonConvert.SerializeObject(apiDataArray)
+                LoginSessionId = sessionId,
+                HttpDate = "2016/4/17 HttpDate",
+                LocalTime = "2016/4/17 LocalTime",
+                RequestValue = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                ResponseValue = "なし",
+                Path = "http://125.6.187.205/kcsapi/api_get_member/useitem",
+                StatusCode = 0000,
             };
 
             var controller = new SendController(apiDataWriterMock.Object)
             {
                 Request = new System.Net.Http.HttpRequestMessage()
             };
-            var result = await controller.MultiPostAsync(parameter);
-            var ret = await result.ExecuteAsync(CancellationToken.None);
-            Assert.AreEqual(HttpStatusCode.NoContent, ret.StatusCode);
+
+            controller.MultiPostAsyncTest(parameter, apiDataArray);
         }
 
         [TestMethod]

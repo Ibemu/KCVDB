@@ -107,9 +107,10 @@ namespace KCVDB.Services.BlobStorage
                 // 今日初めての書き込みならセッション情報を作成
                 if (sessionEntity == null)
                 {
+                    var blobName = GenerateAppendBlobName(now, sessionId);
                     sessionEntity = new SessionEntity(sessionId)
                     {
-                        BlobName = null,
+                        BlobName = blobName,
                         BlobCreated = now,
                     };
                     // テーブル更新

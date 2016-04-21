@@ -83,7 +83,25 @@ namespace KCVDB.Controllers.Api.Sending
 			return NoContent();
 		}
 
-		async Task<string> DecompressToStringAsync(byte[] compressedBuffer) {
+        public void MultiPostAsyncTest(KancolleApiSendParameter model, ApiData[]  apiDatas)
+        {
+            var agentId = model.AgentId;
+            var sessionId = model.LoginSessionId;
+            //var apiData = new ApiData
+            //{
+            //    RequestUri = model.Path,
+            //    ResponseBody = model.ResponseValue,
+            //    RequestBody = model.RequestValue,
+            //    HttpDate = model.HttpDate,
+            //    LocalTime = model.LocalTime,
+            //    StatusCode = model.StatusCode
+            //};
+
+            ApiDataWriter.WriteAsync(agentId, sessionId, apiDatas);
+        }
+
+
+        async Task<string> DecompressToStringAsync(byte[] compressedBuffer) {
 			using (var compressedMemoryStream = new MemoryStream(compressedBuffer))
 			using (var gzipStream = new GZipStream(compressedMemoryStream, CompressionMode.Decompress))
 			using (var decompressedMemoryStream = new MemoryStream()) {
