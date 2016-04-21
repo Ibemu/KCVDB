@@ -83,22 +83,16 @@ namespace KCVDB.Controllers.Api.Sending
 			return NoContent();
 		}
 
-        public void MultiPostAsyncTest(KancolleApiSendParameter model, ApiData[]  apiDatas)
-        {
-            var agentId = model.AgentId;
-            var sessionId = model.LoginSessionId;
-            //var apiData = new ApiData
-            //{
-            //    RequestUri = model.Path,
-            //    ResponseBody = model.ResponseValue,
-            //    RequestBody = model.RequestValue,
-            //    HttpDate = model.HttpDate,
-            //    LocalTime = model.LocalTime,
-            //    StatusCode = model.StatusCode
-            //};
-
-            ApiDataWriter.WriteAsync(agentId, sessionId, apiDatas);
-        }
+        //public void PostTest(MultiPostParameter model)
+        //{
+        //    int i = 0;
+        //    i++;
+        //    var apiDataArray = JsonConvert.DeserializeObject<ApiData[]>(model.JsonArrayData);
+        //    ApiDataWriter.WriteAsync(
+        //        model.AgentId,
+        //        model.SessionId,
+        //        apiDataArray);
+        //}
 
 
         async Task<string> DecompressToStringAsync(byte[] compressedBuffer) {
