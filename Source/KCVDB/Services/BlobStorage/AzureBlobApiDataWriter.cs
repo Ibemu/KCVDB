@@ -59,62 +59,62 @@ namespace KCVDB.Services.BlobStorage
 			// コンテナなかったら作る
 			await BlobContainer.CreateIfNotExistsAsync();
 
-            //// テーブルがなかったら作る
-            //await TableContainer.CreateIfNotExistsAsync();
+            // テーブルがなかったら作る
+            await TableContainer.CreateIfNotExistsAsync();
 
             //// 現在日付
             DateTime now = DateTime.Now;
-            //var date = now.Date.Add(Constants.BlobStorage.OffsetTime);
-            //// TableStorageから取得
-            //var retrieveOperation = TableOperation.Retrieve<SessionEntity>("sessionId",sessionId);
-            //var retrievedResult = TableContainer.Execute(retrieveOperation);
-            //var sessionEntity = retrievedResult.Result as SessionEntity;
+            var date = now.Date.Add(Constants.BlobStorage.OffsetTime);
+            // TableStorageから取得
+            var retrieveOperation = TableOperation.Retrieve<SessionEntity>("sessionId", sessionId);
+            var retrievedResult = TableContainer.Execute(retrieveOperation);
+            var sessionEntity = retrievedResult.Result as SessionEntity;
 
-            //// 要分割
-            //if (sessionEntity?.BlobCreated != null && sessionEntity.BlobCreated < date)
-            //{
-            //    // api_portが含まれる要素のindexを取得
-            //    var firstPortIndex = FindFirstApiIndexOf(apiData, Constants.BlobStorage.ApiPortPath);
-
-            //    var beforePort = firstPortIndex < 0 ? apiData : apiData.Take(firstPortIndex + 1);
-            //    var afterPort = firstPortIndex < 0 ? Enumerable.Empty<ApiData>() : apiData.Skip(firstPortIndex);
-
-            //    if (beforePort.Any())
-            //    {
-            //        var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
-            //        await WriteBlob(appendBlob, beforePort, agentId, sessionId);
-            //    }
-
-            //    if(afterPort.Any())
-            //    {
-            //        var blobName = GenerateAppendBlobName(now, sessionId);
-
-            //        sessionEntity.BlobCreated = now;
-            //        sessionEntity.BlobName = blobName;
-
-            //        var operation = TableOperation.InsertOrReplace(sessionEntity);
-            //        await TableContainer.ExecuteAsync(operation);
-
-            //        var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
-            //        await WriteBlob(appendBlob, afterPort, agentId, sessionId);
-            //    }
-            //}
-            //// 分割いらにょ
-            //else
+            // 要分割
+            if (sessionEntity?.BlobCreated != null && sessionEntity.BlobCreated < date)
             {
-                //// 今日初めての書き込みならセッション情報を作成
-                //if (sessionEntity == null)
-                //{
-                //    var blobName = GenerateAppendBlobName(now, sessionId);
-                //    sessionEntity = new SessionEntity(sessionId)
-                //    {
-                //        BlobName = blobName,
-                //        BlobCreated = now,
-                //    };
-                //    // テーブル更新
-                //    var operation = TableOperation.InsertOrReplace(sessionEntity);
-                //    await TableContainer.ExecuteAsync(operation);
-                //}
+                // api_portが含まれる要素のindexを取得
+                var firstPortIndex = FindFirstApiIndexOf(apiData, Constants.BlobStorage.ApiPortPath);
+
+                var beforePort = firstPortIndex < 0 ? apiData : apiData.Take(firstPortIndex + 1);
+                var afterPort = firstPortIndex < 0 ? Enumerable.Empty<ApiData>() : apiData.Skip(firstPortIndex);
+
+                if (beforePort.Any())
+                {
+                    var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
+                    await WriteBlob(appendBlob, beforePort, agentId, sessionId);
+                }
+
+                if (afterPort.Any())
+                {
+                    var blobName = GenerateAppendBlobName(now, sessionId);
+
+                    sessionEntity.BlobCreated = now;
+                    sessionEntity.BlobName = blobName;
+
+                    var operation = TableOperation.InsertOrReplace(sessionEntity);
+                    await TableContainer.ExecuteAsync(operation);
+
+                    var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
+                    await WriteBlob(appendBlob, afterPort, agentId, sessionId);
+                }
+            }
+            // 分割いらにょ
+            else
+            {
+                // 今日初めての書き込みならセッション情報を作成
+                if (sessionEntity == null)
+                {
+                    var blobName = GenerateAppendBlobName(now, sessionId);
+                    sessionEntity = new SessionEntity(sessionId)
+                    {
+                        BlobName = blobName,
+                        BlobCreated = now,
+                    };
+                    // テーブル更新
+                    var operation = TableOperation.InsertOrReplace(sessionEntity);
+                    await TableContainer.ExecuteAsync(operation);
+                }
 
                 var appendBlob = BlobContainer.GetAppendBlobReference(GenerateAppendBlobName(now, sessionId));
                 await WriteBlob(appendBlob, apiData, agentId, sessionId);

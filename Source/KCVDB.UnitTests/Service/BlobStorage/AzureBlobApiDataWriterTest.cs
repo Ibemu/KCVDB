@@ -50,48 +50,34 @@ namespace KCVDB.UnitTests.Service.BlobStorage
         public void 送信テスト()
         {
             var agentId = Guid.NewGuid().ToString();
-            var sessionId = "送信セッション";
+            var sessionId = "sessionIdsessionId";
             var apiData = new ApiData
             {
                 HttpDate = "unko",
-                LocalTime = "chinko\nmanko",
-                RequestBody = "chinchin \r\n manman",
+                LocalTime = "chinkomanko",
+                RequestBody = "chinchinmanman",
                 ResponseBody = "chimpoko",
                 RequestUri = "manko",
-                StatusCode = 0721,
+                StatusCode = 0000,
             };
 
-            var expected = string.Join(
-                "\t",
-                agentId,
-                sessionId,
-                "manko",    // RequestUri
-                "721",      // StatusCode
-                "unko",     // HttpDate
-                "chinkomanko",      // LocalTime
-                "chinchin  manman", // RequestBody
-                "chimpoko"          // ResponseBody
-            );
-
-            var storageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=kancollevdb;AccountKey=VwjCnYOYYL/5mF+CKYu4evctVmr6tMrjI4/d8gIPZt+JCGhUyDzhXqZB8rBj9U6xdOk+YlFrVuD7ZdmUkaWKIA==;BlobEndpoint=https://kancollevdb.blob.core.windows.net/;TableEndpoint=https://kancollevdb.table.core.windows.net/;QueueEndpoint=https://kancollevdb.queue.core.windows.net/;FileEndpoint=https://kancollevdb.file.core.windows.net/");
+            var storageAccount = CloudStorageAccount.Parse("");
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
 
             var tableClient = storageAccount.CreateCloudTableClient();
             var tableContainer = tableClient.GetTableReference(Constants.BlobStorage.ApiDataTableContainerName);
 
-            //var po = new PrivateObject(typeof(AzureBlobApiDataWriter), blobContainer, tableContainer);
-            //po.Invoke("WriteAsync", agentId, sessionId, apiData);
-            var service = new AzureBlobApiDataWriter(blobContainer, tableContainer);
-            service.WriteAsync(agentId, sessionId, apiData);
-
-            //Assert.AreEqual(expected, actual);
+            var po = new PrivateObject(typeof(AzureBlobApiDataWriter), blobContainer, tableContainer);
+            po.Invoke("WriteAsync", agentId, sessionId, new ApiData[] { apiData });
+            //var service = new AzureBlobApiDataWriter(blobContainer, tableContainer);
+            //service.WriteAsyncaaa(agentId, sessionId, new ApiData[] { apiData });
         }
 
         [TestMethod]
         public void 一覧取得()
         {
-            var storageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=kancollevdb;AccountKey=VwjCnYOYYL/5mF+CKYu4evctVmr6tMrjI4/d8gIPZt+JCGhUyDzhXqZB8rBj9U6xdOk+YlFrVuD7ZdmUkaWKIA==;BlobEndpoint=https://kancollevdb.blob.core.windows.net/;TableEndpoint=https://kancollevdb.table.core.windows.net/;QueueEndpoint=https://kancollevdb.queue.core.windows.net/;FileEndpoint=https://kancollevdb.file.core.windows.net/");
+            var storageAccount = CloudStorageAccount.Parse("");
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
 
@@ -105,7 +91,7 @@ namespace KCVDB.UnitTests.Service.BlobStorage
         [TestMethod]
         public void 単一取得()
         {
-            var storageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=kancollevdb;AccountKey=VwjCnYOYYL/5mF+CKYu4evctVmr6tMrjI4/d8gIPZt+JCGhUyDzhXqZB8rBj9U6xdOk+YlFrVuD7ZdmUkaWKIA==;BlobEndpoint=https://kancollevdb.blob.core.windows.net/;TableEndpoint=https://kancollevdb.table.core.windows.net/;QueueEndpoint=https://kancollevdb.queue.core.windows.net/;FileEndpoint=https://kancollevdb.file.core.windows.net/");
+            var storageAccount = CloudStorageAccount.Parse("");
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
 
@@ -124,7 +110,7 @@ namespace KCVDB.UnitTests.Service.BlobStorage
         [TestMethod]
         public void テーブルかきかき()
         {
-            var storageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=kancollevdb;AccountKey=VwjCnYOYYL/5mF+CKYu4evctVmr6tMrjI4/d8gIPZt+JCGhUyDzhXqZB8rBj9U6xdOk+YlFrVuD7ZdmUkaWKIA==;BlobEndpoint=https://kancollevdb.blob.core.windows.net/;TableEndpoint=https://kancollevdb.table.core.windows.net/;QueueEndpoint=https://kancollevdb.queue.core.windows.net/;FileEndpoint=https://kancollevdb.file.core.windows.net/");
+            var storageAccount = CloudStorageAccount.Parse("");
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
 
@@ -140,7 +126,7 @@ namespace KCVDB.UnitTests.Service.BlobStorage
         [TestMethod]
         public void テーブルインサートリプレイス()
         {
-            var storageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=kancollevdb;AccountKey=VwjCnYOYYL/5mF+CKYu4evctVmr6tMrjI4/d8gIPZt+JCGhUyDzhXqZB8rBj9U6xdOk+YlFrVuD7ZdmUkaWKIA==;BlobEndpoint=https://kancollevdb.blob.core.windows.net/;TableEndpoint=https://kancollevdb.table.core.windows.net/;QueueEndpoint=https://kancollevdb.queue.core.windows.net/;FileEndpoint=https://kancollevdb.file.core.windows.net/");
+            var storageAccount = CloudStorageAccount.Parse("");
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
 
