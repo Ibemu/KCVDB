@@ -59,70 +59,68 @@ namespace KCVDB.Services.BlobStorage
 			// コンテナなかったら作る
 			await BlobContainer.CreateIfNotExistsAsync();
 
-            // テーブルがなかったら作る
-            await TableContainer.CreateIfNotExistsAsync();
+            //// テーブルがなかったら作る
+            //await TableContainer.CreateIfNotExistsAsync();
 
-            // 現在日付
+            //// 現在日付
             DateTime now = DateTime.Now;
-            var date = now.Date.Add(Constants.BlobStorage.OffsetTime);
-            // TableStorageから取得
-            var retrieveOperation = TableOperation.Retrieve<SessionEntity>(sessionId,sessionId);
-            var retrievedResult = TableContainer.Execute(retrieveOperation);
-            var sessionEntity = retrievedResult.Result as SessionEntity;
+            //var date = now.Date.Add(Constants.BlobStorage.OffsetTime);
+            //// TableStorageから取得
+            //var retrieveOperation = TableOperation.Retrieve<SessionEntity>("sessionId",sessionId);
+            //var retrievedResult = TableContainer.Execute(retrieveOperation);
+            //var sessionEntity = retrievedResult.Result as SessionEntity;
 
-            // 要分割
-            if (sessionEntity?.BlobCreated != null && sessionEntity.BlobCreated < date)
+            //// 要分割
+            //if (sessionEntity?.BlobCreated != null && sessionEntity.BlobCreated < date)
+            //{
+            //    // api_portが含まれる要素のindexを取得
+            //    var firstPortIndex = FindFirstApiIndexOf(apiData, Constants.BlobStorage.ApiPortPath);
+
+            //    var beforePort = firstPortIndex < 0 ? apiData : apiData.Take(firstPortIndex + 1);
+            //    var afterPort = firstPortIndex < 0 ? Enumerable.Empty<ApiData>() : apiData.Skip(firstPortIndex);
+
+            //    if (beforePort.Any())
+            //    {
+            //        var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
+            //        await WriteBlob(appendBlob, beforePort, agentId, sessionId);
+            //    }
+
+            //    if(afterPort.Any())
+            //    {
+            //        var blobName = GenerateAppendBlobName(now, sessionId);
+
+            //        sessionEntity.BlobCreated = now;
+            //        sessionEntity.BlobName = blobName;
+
+            //        var operation = TableOperation.InsertOrReplace(sessionEntity);
+            //        await TableContainer.ExecuteAsync(operation);
+
+            //        var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
+            //        await WriteBlob(appendBlob, afterPort, agentId, sessionId);
+            //    }
+            //}
+            //// 分割いらにょ
+            //else
             {
-                // api_portが含まれる要素のindexを取得
-                var firstPortIndex = FindFirstApiIndexOf(apiData, Constants.BlobStorage.ApiPortPath);
+                //// 今日初めての書き込みならセッション情報を作成
+                //if (sessionEntity == null)
+                //{
+                //    var blobName = GenerateAppendBlobName(now, sessionId);
+                //    sessionEntity = new SessionEntity(sessionId)
+                //    {
+                //        BlobName = blobName,
+                //        BlobCreated = now,
+                //    };
+                //    // テーブル更新
+                //    var operation = TableOperation.InsertOrReplace(sessionEntity);
+                //    await TableContainer.ExecuteAsync(operation);
+                //}
 
-                var beforePort = firstPortIndex < 0 ? apiData : apiData.Take(firstPortIndex + 1);
-                var afterPort = firstPortIndex < 0 ? Enumerable.Empty<ApiData>() : apiData.Skip(firstPortIndex);
-
-                if (beforePort.Any())
-                {
-                    var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
-                    await WriteBlob(appendBlob, beforePort, agentId, sessionId);
-                }
-
-                if(afterPort.Any())
-                {
-                    var blobName = GenerateAppendBlobName(now, sessionId);
-
-                    sessionEntity.BlobCreated = now;
-                    sessionEntity.BlobName = blobName;
-
-                    var operation = TableOperation.InsertOrReplace(sessionEntity);
-                    await TableContainer.ExecuteAsync(operation);
-
-                    var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
-                    await WriteBlob(appendBlob, afterPort, agentId, sessionId);
-                }
-
-
-            }
-            // 分割いらにょ
-            else
-            {
-                // 今日初めての書き込みならセッション情報を作成
-                if (sessionEntity == null)
-                {
-                    var blobName = GenerateAppendBlobName(now, sessionId);
-                    sessionEntity = new SessionEntity(sessionId)
-                    {
-                        BlobName = blobName,
-                        BlobCreated = now,
-                    };
-                    // テーブル更新
-                    var operation = TableOperation.InsertOrReplace(sessionEntity);
-                    await TableContainer.ExecuteAsync(operation);
-                }
-
-                var appendBlob = BlobContainer.GetAppendBlobReference(sessionEntity.BlobName);
+                var appendBlob = BlobContainer.GetAppendBlobReference(GenerateAppendBlobName(now, sessionId));
                 await WriteBlob(appendBlob, apiData, agentId, sessionId);
             }
 		}
-
+        
         /// <summary>
         /// Blob書き込み
         /// </summary>
@@ -191,5 +189,89 @@ namespace KCVDB.Services.BlobStorage
                             .FirstOrDefault(x => x.Data.RequestUri.Contains(apiUrl))
                             ?.Index ?? 0) - 1;
         }
-	}
+
+        #region テストメソッド
+        public List<string> ReadTableStorage()
+        {
+            // Construct the query operation for all customer entities where PartitionKey="Smith".
+            TableQuery<SessionEntity> query = new TableQuery<SessionEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "sessionId"));
+
+            List<string> strList = new List<string>();
+
+            var exe = TableContainer.ExecuteQuery(query);
+            // Print the fields for each customer.
+            foreach (SessionEntity entity in exe)
+            {
+                string str = entity.PartitionKey + entity.RowKey + entity.BlobName + entity.BlobCreated.ToShortDateString();
+
+                strList.Add(str);
+            }
+
+            return strList;
+        }
+
+        public string ReadTableStorageOnly()
+        {
+            string str = "";
+            var session = new SessionEntity();
+
+            var retrieveOperation = TableOperation.Retrieve<SessionEntity>("sessionId", "送信セッション");
+
+            var exe = TableContainer.Execute(retrieveOperation);
+            // Print the fields for each customer.
+
+            if (exe.Result != null)
+            {
+                session = exe.Result as SessionEntity;
+                str = session.BlobName;
+            }
+
+            return str;
+        }
+
+        public void WriteTableStorage()
+        {
+            TableContainer.CreateIfNotExists();
+            // Construct the query operation for all customer entities where PartitionKey="Smith".
+            TableQuery<SessionEntity> query = new TableQuery<SessionEntity>();
+
+            DateTime now = DateTime.Now;
+            var sessionId = Guid.NewGuid().ToString();
+
+            // Create a new customer entity.
+            SessionEntity session = new SessionEntity("セッションID固定");
+            session.BlobName = GenerateAppendBlobName(now, sessionId);
+            session.BlobCreated = now;
+
+            // Create the TableOperation object that inserts the customer entity.
+            TableOperation insertOperation = TableOperation.Insert(session);
+
+            // Execute the insert operation.
+            TableContainer.Execute(insertOperation);
+
+        }
+
+        public void InsertorReplaceTableStorage()
+        {
+            TableContainer.CreateIfNotExists();
+            // Construct the query operation for all customer entities where PartitionKey="Smith".
+            TableQuery<SessionEntity> query = new TableQuery<SessionEntity>();
+
+            DateTime now = DateTime.Now;
+            var sessionId = "sessionsession";
+
+            // Create a new customer entity.
+            SessionEntity session = new SessionEntity("セッションID固定");
+            session.BlobName = GenerateAppendBlobName(now, sessionId);
+            session.BlobCreated = now;
+
+            // Create the TableOperation object that inserts the customer entity.
+            TableOperation insertOperation = TableOperation.InsertOrReplace(session);
+
+            // Execute the insert operation.
+            TableContainer.Execute(insertOperation);
+
+        }
+        #endregion
+    }
 }

@@ -10,7 +10,7 @@ namespace KCVDB.Services.BlobStorage
     {
         public SessionEntity(string sessionId)
         {
-            this.PartitionKey = sessionId;
+            this.PartitionKey = "sessionId";
             this.RowKey = sessionId;
         }
 
