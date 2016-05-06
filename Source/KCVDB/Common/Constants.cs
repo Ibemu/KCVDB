@@ -28,6 +28,8 @@
             /// 24時を基準にBlobを分ける時間を設定
             /// </summary>
             public static System.TimeSpan OffsetTime { get; } = new System.TimeSpan(0, 0, 0);
+
+            public static System.TimeSpan OffsetGMT { get; } = new System.TimeSpan(9, 0, 0);
 		}
 	}
 }

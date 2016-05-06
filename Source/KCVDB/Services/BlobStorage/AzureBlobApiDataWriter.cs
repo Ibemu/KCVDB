@@ -63,7 +63,7 @@ namespace KCVDB.Services.BlobStorage
             await TableContainer.CreateIfNotExistsAsync();
 
             //// 現在日付
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow.Add(Constants.BlobStorage.OffsetGMT);
             var date = now.Date.Add(Constants.BlobStorage.OffsetTime);
             // TableStorageから取得
             var retrieveOperation = TableOperation.Retrieve<SessionEntity>("sessionId", sessionId);
@@ -187,7 +187,7 @@ namespace KCVDB.Services.BlobStorage
         {
             return (apiDatas.Select((x, i) => new { Data = x, Index = i })
                             .FirstOrDefault(x => x.Data.RequestUri.Contains(apiUrl))
-                            ?.Index ?? 0) - 1;
+                            ?.Index ?? -1);
         }
 
         #region テストメソッド

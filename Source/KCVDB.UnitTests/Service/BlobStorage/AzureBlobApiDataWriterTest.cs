@@ -138,5 +138,181 @@ namespace KCVDB.UnitTests.Service.BlobStorage
 
             //Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        public void findindextest1()
+        {
+            var apiDataArray = new ApiData[] {
+                    new ApiData {
+                        HttpDate = "2016/4/17 HttpDate",
+                        LocalTime = "2016/4/17 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "なし",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_get_member/unsetslot",
+                        StatusCode = 0000,
+                    },
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "切り替わるぞ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                        StatusCode = 0000,
+                    },
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "変わったにょ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_req_mission/result",
+                        StatusCode = 0000,
+                    },
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "変わったにょ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                        StatusCode = 0000,
+                    },
+                };
+
+            var storageAccount = CloudStorageAccount.Parse("");
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
+
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableContainer = tableClient.GetTableReference(Constants.BlobStorage.ApiDataTableContainerName);
+
+            var service = new AzureBlobApiDataWriter(blobContainer, tableContainer);
+
+            //int count = service.FindFirstApiIndexOf(apiDataArray, "/kcsapi/api_port/port");
+
+            //Assert.AreEqual(1, count);
+
+            //Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void findindextest2()
+        {
+            var apiDataArray = new ApiData[] {
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "切り替わるぞ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                        StatusCode = 0000,
+                    },
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "変わったにょ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_req_mission/result",
+                        StatusCode = 0000,
+                    },
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "変わったにょ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                        StatusCode = 0000,
+                    },
+                };
+
+            var storageAccount = CloudStorageAccount.Parse("");
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
+
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableContainer = tableClient.GetTableReference(Constants.BlobStorage.ApiDataTableContainerName);
+
+            var service = new AzureBlobApiDataWriter(blobContainer, tableContainer);
+
+            //int count = service.FindFirstApiIndexOf(apiDataArray, "/kcsapi/api_port/port");
+
+            //Assert.AreEqual(0, count);
+
+            //Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void findindextest3()
+        {
+            var apiDataArray = new ApiData[] {
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "変わったにょ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_req_mission/result",
+                        StatusCode = 0000,
+                    },
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "変わったにょ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_req_mission/result",
+                        StatusCode = 0000,
+                    },
+                };
+
+            var storageAccount = CloudStorageAccount.Parse("");
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
+
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableContainer = tableClient.GetTableReference(Constants.BlobStorage.ApiDataTableContainerName);
+
+            var service = new AzureBlobApiDataWriter(blobContainer, tableContainer);
+
+            //int count = service.FindFirstApiIndexOf(apiDataArray, "/kcsapi/api_port/port");
+
+            //Assert.AreEqual(-1, count);
+
+            //Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void findindextest4()
+        {
+            var apiDataArray = new ApiData[] {
+                    new ApiData {
+                        HttpDate = "2016/4/18 HttpDate",
+                        LocalTime = "2016/4/18 LocalTime",
+                        RequestBody = "艦これ艦これ艦これ艦これ艦これ艦こけ",
+                        ResponseBody = "切り替わるぞ",
+                        RequestUri = "http://125.6.187.205/kcsapi/api_port/port",
+                        StatusCode = 0000,
+                    },
+                };
+
+            var storageAccount = CloudStorageAccount.Parse("");
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(Constants.BlobStorage.ApiDataBlobContainerName);
+
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableContainer = tableClient.GetTableReference(Constants.BlobStorage.ApiDataTableContainerName);
+
+            var service = new AzureBlobApiDataWriter(blobContainer, tableContainer);
+
+            //int count = service.FindFirstApiIndexOf(apiDataArray, "/kcsapi/api_port/port");
+
+            //Assert.AreEqual(0, count);
+
+            //Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void 日付オフセット()
+        {
+            DateTime now = DateTime.UtcNow.Add(Constants.BlobStorage.OffsetGMT);
+
+            var date = now.Date.Add(Constants.BlobStorage.OffsetTime);
+        }
     }
 }
