@@ -14,11 +14,11 @@
 - **LocalTime** 送信クライアントが艦これAPIを受信した日時を表す[RFC1123](https://www.ietf.org/rfc/rfc1123.txt)形式の文字列。
 
 プロトコルには以下の三種類がある
-- `/send/api/gzip`
-- `/send/api/multi`
-- `/send/api`
+- `/api/send/gzip`
+- `/api/send/multi`
+- `/api/send`
 
-### /send/api/gzip
+### /api/send/gzip
 `https://kancollevdataapi.azurewebsites.net/api/send/gzip`へ`multipart/form-data`でPOSTする。検証DBへの送信が完了するまで、次の艦これAPIを送信してはならない。
 
 multipart/form-dataで指定する引数は以下の通り。
@@ -47,10 +47,10 @@ multipart/form-dataで指定する引数は以下の通り。
 
 検証DBへの負荷軽減のため、未送信の艦これAPIが2つ以上ある場合、それらを1回の送信でまとめておくるべきである。例えば、検証DBへ艦これAPIを送信している間に艦これサーバーから新しい艦これAPIを2つ以上受信した場合、それらをまとめて一度に検証DBへ送信するのが望ましい。
 
-### /send/api/multi
+### /api/send/multi
 工事中
 
-### /send/api
+### /api/send
 工事中
 
 ### セッション
