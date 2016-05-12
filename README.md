@@ -7,8 +7,8 @@
 - **SessionId** セッションを表すUUID文字列。セッションについては後述。
 - **AgentId** 送信クライアントとそのバージョンを表す文字列。
 - **RequestUri** 艦これAPIの絶対URL。スキーマ(http)、ホスト(IPアドレスまたはドメイン)も含める。
-- **RequestValue** 艦これAPIのリクエストボディ。
-- **ResponseValue** 艦これAPIのレスポンスボディ。なお、`svdata=`等のプレフィックスも削除せずそのまま与える。
+- **RequestBody** 艦これAPIのリクエストボディ。
+- **ResponseBody** 艦これAPIのレスポンスボディ。なお、`svdata=`等のプレフィックスも削除せずそのまま与える。
 - **StatusCode** 艦これAPIのレスポンスのステータスコードを表す数値。
 - **HttpDate** 艦これAPIのレスポンスヘッダーの`Date`フィールドから得られる文字列。
 - **LocalTime** 送信クライアントが艦これAPIを受信した日時を表す[RFC1123](https://www.ietf.org/rfc/rfc1123.txt)形式の文字列。
